@@ -3,25 +3,26 @@ import cv2
 from matplotlib import pyplot as plt
 
 
-img = cv2.imread('cat_l.jpg')
-plt.show( img )
+img = cv2.imread('disparity.jpg')
+plt.show(img)
 
 gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-ret, thresh = cv2.threshold(gray,72,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
 
 
 # noise removal
-kernel = np.ones((5,5),np.uint8)
-opening = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,kernel, iterations = 1)
+kernel = np.ones((11,11),np.uint8)
+kernel1 = np.ones((7,7),np.uint8)
+opening = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,kernel1, iterations = 1)
 
 
 # sure background area
-sure_bg = cv2.dilate(opening,kernel,iterations=15)
+sure_bg = cv2.dilate(opening,kernel,iterations=10)
 
 
 # Finding sure foreground area
 dist_transform = cv2.distanceTransform(opening,cv2.DIST_L2,5)
-ret, sure_fg = cv2.threshold(dist_transform,0.5*dist_transform.max(),255,0)
+ret, sure_fg = cv2.threshold(dist_transform,0.007*dist_transform.max(),255,0)
 
 
 # Finding unknown region
@@ -37,16 +38,13 @@ markers = markers+1
 
 # Now, mark the region of unknown with zero
 markers[unknown==255] = 0
-
 markers = cv2.watershed(img,markers)
-#chat et mure 
-img[markers == 1] = [255,255,255]
-#cote gauche en dessu du bon
-img[markers == 3] = [0,128,0]
+img[markers == -1] = [255,255,0]
 
-img[markers == 2] = [255,0,255]
-img[markers == 4] = [125,128,0]
 
-img[markers == 5] = [58,0,0]
-plt.show(img)
+img[markers == 1] = [200,0,255]
+img[markers == 2] = [0,0,0]
+img[markers == 3] = [128,128,0]
+
+img[markers == 4] = [128,20,0]
 cv2.imwrite('segmented.jpg',img)
