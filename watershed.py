@@ -11,10 +11,9 @@ ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
 
 
 # noise removal
-kernel = np.ones((12,12),np.uint8)
+kernel = np.ones((13,13),np.uint8)
 kernel1 = np.ones((13,13),np.uint8)
 opening = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,kernel1, iterations = 1)
-
 
 # sure background area
 sure_erode = cv2.dilate(opening,kernel,iterations=5)
