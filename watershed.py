@@ -11,14 +11,14 @@ ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
 
 
 # noise removal
-kernel = np.ones((11,11),np.uint8)
-kernel1 = np.ones((7,7),np.uint8)
+kernel = np.ones((12,12),np.uint8)
+kernel1 = np.ones((13,13),np.uint8)
 opening = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,kernel1, iterations = 1)
 
 
 # sure background area
-sure_bg = cv2.dilate(opening,kernel,iterations=10)
-
+sure_erode = cv2.dilate(opening,kernel,iterations=5)
+sure_bg = cv2.dilate(sure_erode,kernel1,iterations=4)
 
 # Finding sure foreground area
 dist_transform = cv2.distanceTransform(opening,cv2.DIST_L2,5)
@@ -44,7 +44,7 @@ img[markers == -1] = [255,255,0]
 
 img[markers == 1] = [200,0,255]
 img[markers == 2] = [0,0,0]
-img[markers == 3] = [128,128,0]
+img[markers == 3] = [0,0,0]
 
-img[markers == 4] = [128,20,0]
+img[markers == 4] = [0,0,0]
 cv2.imwrite('segmented.jpg',img)
